@@ -6,11 +6,9 @@ import calendar
 import pandas as pd
 import os
 
+from paths import DATA_DIR, ENSO_DATA_DIR, output_dir_for
 
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(_PROJECT_ROOT, "data")
-ENSO_DATA_DIR = os.path.join(DATA_DIR, "enso")
-OUTPUT_DIR = os.path.join(_PROJECT_ROOT, "output", "enso")
+OUTPUT_DIR = output_dir_for("enso")
 
 
 def add_aura_watermarks(fig, ax, logo_path=None):

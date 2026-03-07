@@ -14,10 +14,9 @@ from scipy.ndimage import gaussian_filter
 from shapely.geometry import Point
 from shapely.ops import unary_union
 
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_PROJECT_ROOT = os.path.dirname(_SCRIPT_DIR)
-DATA_DIR = os.path.join(_PROJECT_ROOT, "data")
-OUTPUT_DIR = os.path.join(_PROJECT_ROOT, "output", "sea_ice")
+from paths import DATA_DIR, output_dir_for
+
+OUTPUT_DIR = output_dir_for("sea_ice")
 
 # Colormap: light blue = no ice (0), deep blue = full ice (1).
 _WHITE_TO_BLUE = ["#ffffff", "#deebf7", "#9ecae1", "#4292c6", "#08519c", "#08306b"]

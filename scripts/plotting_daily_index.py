@@ -11,8 +11,10 @@ import matplotlib.image as mimg
 import matplotlib.ticker as mticker
 from matplotlib.transforms import blended_transform_factory
 
+from paths import DATA_DIR, WATERMARK_LOGO_PATH, output_dir_for
+
 # --- Edit these ---
-INPUT_CSV = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "aao.csv")
+INPUT_CSV = os.path.join(DATA_DIR, "aao.csv")
 VALUE_COLUMN = "aao"  # column name for the index to plot
 PLOT_TITLE = "AAO — Antarctic Oscillation Index"
 Y_AXIS_LABEL = "AAO index"
@@ -36,7 +38,6 @@ REFERENCE_LINES = [
 ]
 REFERENCE_BAND = None  # e.g. (-0.5, 0.5) for neutral, or None
 
-WATERMARK_LOGO_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "aura-logo-square-trans (2).png")
 WATERMARK_ALPHA = 0.12
 
 # CSV column names (if your file uses different names, change here)
@@ -211,8 +212,7 @@ def build_and_save_plot(
 
 def main():
     df = load_and_prepare_daily(INPUT_CSV, VALUE_COLUMN, COL_YEAR, COL_MONTH, COL_DAY)
-    _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    output_dir = os.path.join(_root, "output", "daily_index", f"{os.path.splitext(os.path.basename(INPUT_CSV))[0]}_plots_{date.today().isoformat()}")
+    output_dir = os.path.join(output_dir_for("daily_index"), f"{os.path.splitext(os.path.basename(INPUT_CSV))[0]}_plots_{date.today().isoformat()}")
     os.makedirs(output_dir, exist_ok=True)
     build_and_save_plot(
         df, VALUE_COLUMN, output_dir,

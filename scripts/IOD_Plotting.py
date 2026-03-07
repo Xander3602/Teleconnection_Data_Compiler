@@ -7,11 +7,10 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import numpy as np
 from scipy.interpolate import make_interp_spline
 
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+from paths import DATA_DIR, PROJECT_ROOT, WATERMARK_LOGO_PATH, output_dir_for
 
-# =============================================================================
-# CONFIGURATION - Customize these settings
-# =============================================================================
+# Alias for compatibility with variable name used in this script
+WATERMARK_PATH = WATERMARK_LOGO_PATH
 
 # Date range to plot (None = use full range from data)
 # Examples: (1990, 2020), (2000, None) for 2000 to latest, (None, 2010) for start to 2010
@@ -39,10 +38,7 @@ HIGHLIGHT_COLOR = '#FFD700'  # Gold for highlighted points
 HIGHLIGHT_MARKER_SIZE = 120
 
 # Data and watermark paths (relative to project root: data/ and assets/)
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_PROJECT_ROOT = os.path.dirname(_SCRIPT_DIR)
-DATA_CSV = os.path.join(_PROJECT_ROOT, 'data', 'JMA_IOD_Data_long.csv')
-WATERMARK_PATH = os.path.join(_PROJECT_ROOT, 'assets', 'aura-logo-square-trans (2).png')
+DATA_CSV = os.path.join(DATA_DIR, 'JMA_IOD_Data_long.csv')
 WATERMARK_ALPHA = 0.15  # Transparency (0 = invisible, 1 = fully opaque)
 WATERMARK_SCALE = 0.25  # Size scale relative to original image
 
@@ -263,7 +259,7 @@ if __name__ == "__main__":
     print(f"Most negative: {min_row['Month']} {int(min_row['Year'])} ({min_row['PDO']:.2f})")
     print(f"\nHighlighting points: {HIGHLIGHT_POINTS}")
     print("Creating chart...")
-    _iod_out = os.path.join(_PROJECT_ROOT, 'output', 'iod', 'iod_area_chart.png')
+    _iod_out = os.path.join(output_dir_for("iod"), "iod_area_chart.png")
     os.makedirs(os.path.dirname(_iod_out), exist_ok=True)
     fig, ax = create_pdo_area_chart(
         pdo_df,

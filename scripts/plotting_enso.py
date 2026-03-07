@@ -7,6 +7,12 @@ import matplotlib.image as mimg
 import matplotlib.ticker as mticker
 from matplotlib.transforms import blended_transform_factory
 
+from paths import (
+    DATA_DIR,
+    WATERMARK_LOGO_PATH,
+    output_dir_for,
+)
+
 # --- Edit these ---
 YEARS_TO_PLOT = [2026, 2023, 2018, 2014, 2009, 2006, 2002, 1997]
 CURRENT_YEAR = 2026
@@ -15,23 +21,50 @@ ENSO_REGION = "nino34"  # used only when PLOT_ALL_REGIONS is False
 PLOT_ALL_REGIONS = True
 ALL_REGIONS = ["nino12", "nino3", "nino34", "nino4"]
 
-WATERMARK_LOGO_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "aura-logo-square-trans (2).png")
 WATERMARK_ALPHA = 0.12
 
 REGION_LABELS = {"nino12": "Niño 1+2", "nino3": "Niño 3", "nino34": "Niño 3.4", "nino4": "Niño 4"}
 LA_NINA_THRESHOLD = -0.5
 EL_NINO_THRESHOLD = 0.5
 
-# Load and prepare data once
-df = pd.read_csv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "enso.csv"))
-df["month"] = df["month"].astype(int)
-df["day"] = df["day"].astype(int)
-df["year"] = df["year"].astype(int)
-dates = pd.to_datetime(df[["year", "month", "day"]])
-df["day_of_year"] = dates.dt.dayofyear
-days_in_year = dates.dt.is_leap_year.map({True: 366, False: 365})
-df["x"] = 1 + (df["day_of_year"] - 1) / days_in_year * 11
-df = df.sort_values(["year", "month", "day"]).reset_index(drop=True)
+
+def load_enso_data():
+    """Load and prepare ENSO CSV; returns DataFrame with day_of_year and x."""
+    df = pd.read_csv(os.path.join(DATA_DIR, "enso.csv"))
+    df["month"] = df["month"].astype(int)
+    df["day"] = df["day"].astype(int)
+    df["year"] = df["year"].astype(int)
+    dates = pd.to_datetime(df[["year", "month", "day"]])
+    df["day_of_year"] = dates.dt.dayofyear
+    days_in_year = dates.dt.is_leap_year.map({True: 366, False: 365})
+    df["x"] = 1 + (df["day_of_year"] - 1) / days_in_year * 11
+    df = df.sort_values(["year", "month", "day"]).reset_index(drop=True)
+    return df
+
+
+def main():
+    df = load_enso_data()
+    output_dir = os.path.join(output_dir_for("enso"), f"enso_plots_{date.today().isoformat()}")
+    os.makedirs(output_dir, exist_ok=True)
+    if PLOT_ALL_REGIONS:
+        for reg in ALL_REGIONS:
+            build_and_save_enso_plot(
+                df, reg, output_dir,
+                YEARS_TO_PLOT, CURRENT_YEAR,
+                WATERMARK_LOGO_PATH, WATERMARK_ALPHA,
+            )
+        print(f"Saved 4 plots to folder: {output_dir}")
+    else:
+        build_and_save_enso_plot(
+            df, ENSO_REGION, output_dir,
+            YEARS_TO_PLOT, CURRENT_YEAR,
+            WATERMARK_LOGO_PATH, WATERMARK_ALPHA,
+        )
+        print(f"Saved 1 plot to folder: {output_dir}")
+
+
+if __name__ == "__main__":
+    main()
 
 
 def build_and_save_enso_plot(
@@ -145,25 +178,3 @@ def build_and_save_enso_plot(
     fig.savefig(f"{base}.png", dpi=300, bbox_inches="tight", facecolor="white", edgecolor="none")
     fig.savefig(f"{base}.svg", format="svg", bbox_inches="tight", facecolor="white", edgecolor="none")
     plt.close(fig)
-
-
-# Output folder: output/enso/ with date-stamped subfolder
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUTPUT_DIR = os.path.join(_PROJECT_ROOT, "output", "enso", f"enso_plots_{date.today().isoformat()}")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-if PLOT_ALL_REGIONS:
-    for reg in ALL_REGIONS:
-        build_and_save_enso_plot(
-            df, reg, OUTPUT_DIR,
-            YEARS_TO_PLOT, CURRENT_YEAR,
-            WATERMARK_LOGO_PATH, WATERMARK_ALPHA,
-        )
-    print(f"Saved 4 plots to folder: {OUTPUT_DIR}")
-else:
-    build_and_save_enso_plot(
-        df, ENSO_REGION, OUTPUT_DIR,
-        YEARS_TO_PLOT, CURRENT_YEAR,
-        WATERMARK_LOGO_PATH, WATERMARK_ALPHA,
-    )
-    print(f"Saved 1 plot to folder: {OUTPUT_DIR}")

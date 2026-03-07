@@ -6,8 +6,8 @@ Output: data/enso/ssta_YYYY_MM.nc (used by enso_sst_plot.py).
 import os
 import cdsapi
 
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENSO_DATA_DIR = os.path.join(_PROJECT_ROOT, "data", "enso")
+from paths import ENSO_DATA_DIR
+
 os.makedirs(ENSO_DATA_DIR, exist_ok=True)
 
 # Edit year/month as needed
@@ -28,6 +28,12 @@ request = {
     "area": [5, -170, -5, -120],  # Niño 3.4 region
 }
 
-c = cdsapi.Client()
-c.retrieve(dataset, request, OUTPUT_FILE)
-print(f"Saved: {OUTPUT_FILE}")
+
+def main():
+    c = cdsapi.Client()
+    c.retrieve(dataset, request, OUTPUT_FILE)
+    print(f"Saved: {OUTPUT_FILE}")
+
+
+if __name__ == "__main__":
+    main()
