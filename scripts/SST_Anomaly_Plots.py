@@ -7,8 +7,14 @@ import cartopy.crs as ccrs
 
 from paths import DATA_DIR, output_dir_for
 
-main_development_region = {"North": 20, "South": 8, "West": 295, "East": 350}
+main_development_region_atlantic = {"North": 20, "South": 8, "West": -65, "East": -10}
 mediterranean_sea = {"North": 45, "South": 30, "West": 0, "East": 35}
+western_indian_ocean = {"North": 10, "South": -10, "West": 50, "East": 70}
+eastern_indian_ocean = {"North": 10, "South": -10, "West": 90, "East": 110}
+Gulf_of_Mexico = {"North": 30, "South": 20, "West": -100, "East": -80}
+Gulf_of_Alaska = {"North": 60, "South": 45, "West": -165, "East": -125}
+Gulf_of_Guinea = {"North": 10, "South": -5, "West": -15, "East": 10}
+
 
 
 def partition_sst_by_region(sst: xr.Dataset, region: dict) -> xr.Dataset:
@@ -20,8 +26,12 @@ def partition_sst_by_region(sst: xr.Dataset, region: dict) -> xr.Dataset:
     Returns:
         xarray.Dataset containing the SST data for the given region
     """
+    lon_360 = sst.lon.where(sst.lon >= 0, sst.lon + 360)
+    west = region["West"] + 360 if region["West"] < 0 else region["West"]
+    east = region["East"] + 360 if region["East"] < 0 else region["East"]
+
     partition = sst.where((sst.lat > region["South"]) & (sst.lat < region["North"]))
-    partition = partition.where((partition.lon >= region["West"]) & (partition.lon <= region["East"]))
+    partition = partition.where((lon_360 >= west) & (lon_360 <= east))
     return partition
 
 def calculate_daily_average_sst_anomaly(sst: xr.Dataset, region: dict) -> xr.Dataset:
