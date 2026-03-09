@@ -7,8 +7,14 @@ import os
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(_SCRIPT_DIR)
 
-DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+# Data files live in Documents/data_fetcher (expanduser for portability)
+DATA_DIR = os.path.expanduser(os.path.join("~", "Documents", "data_fetcher"))
 ENSO_DATA_DIR = os.path.join(DATA_DIR, "enso")
+
+# NOAA NetCDF data: three product types in subdirectories (names match data_fetcher)
+NOAA_SST_MEAN_DIR = os.path.join(DATA_DIR, "NOAA_sst.day.mean")   # sst.day.mean.*.nc
+NOAA_SST_ANOM_DIR = os.path.join(DATA_DIR, "NOAA_sst.day.anom")   # sst.day.anom.*.nc
+NOAA_SEA_ICE_DIR = os.path.join(DATA_DIR, "NOAA_icec.day.mean")   # icec.day.mean.*.nc
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
 
 # Default watermark logo path (used by ENSO, daily index, IOD scripts)

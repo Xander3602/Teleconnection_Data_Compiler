@@ -14,7 +14,7 @@ from scipy.ndimage import gaussian_filter
 from shapely.geometry import Point
 from shapely.ops import unary_union
 
-from paths import DATA_DIR, output_dir_for
+from paths import NOAA_SEA_ICE_DIR, output_dir_for
 
 OUTPUT_DIR = output_dir_for("sea_ice")
 
@@ -106,7 +106,7 @@ def main():
     proj_params = region_config["projection"]
     ports = region_config.get("ports", [])
 
-    ds = xr.open_dataset(os.path.join(DATA_DIR, "icec.day.mean.2026.nc"))
+    ds = xr.open_dataset(os.path.join(NOAA_SEA_ICE_DIR, "icec.day.mean.2026.nc"))
     icec = ds.icec
     icec = partition_icec_by_region(icec, bounds)
 
@@ -161,7 +161,7 @@ def main():
 
     # Climatology: 7-day mean for same day-of-year range (for overlay)
     try:
-        ltm_path = os.path.join(DATA_DIR, "icec.day.mean.ltm.1991-2020.nc")
+        ltm_path = os.path.join(NOAA_SEA_ICE_DIR, "icec.day.mean.ltm.1991-2020.nc")
         ltm_ds = xr.open_dataset(ltm_path)
         # Map our 7-day window to LTM time indices (0-based day of year)
         doy_indices = icec_sub.time.dt.dayofyear.isel(time=time_slice).values
